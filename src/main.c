@@ -10,6 +10,9 @@ static char respath[]="./res/";
 static char *open_modes[] = {"r+b", "w+b"};
 char *filepath , *filename;
 
+void error_check(read_error_code_t work_result){
+    if(work_result != READ_OK) exit(1);
+}
 
 int options_list(){
     int i;
@@ -64,10 +67,9 @@ int main(){
     read_error_code_t result;
     new_file_path(respath);
     current_bmp_image = fileopen("to open", open_modes[0]);
-    if(read_header(current_bmp_image, &current_header) != 0) exit(1);
+    error_check(read_header(current_bmp_image, &current_header) != 0);
     current_image = get_header_info(current_header);
-    /*printf("%d %d\n",current_image.biHeight, current_image.biWidth);*/
-    if((result = read_body(&current_image, current_bmp_image)) != 0) exit(1);
+    error_check((result = read_body(&current_image, current_bmp_image)) != 0);
     fclose(current_bmp_image);
     while(input = options_list()){
         current_image = functions_list[--input](current_image);

@@ -17,7 +17,7 @@ read_error_code_t read_body(image_t *image_short_info, FILE* opened_file){
     trash_len = (4-(array_length % 4))%4;
     image_short_info->colorArray = malloc(array_length*image_short_info->biHeight);
     for(i = 0; i < image_short_info->biHeight; i++){
-        fread(image_short_info->colorArray+(image_short_info->biWidth * i), array_length, 1, opened_file);
+        if(fread(image_short_info->colorArray+(image_short_info->biWidth * i), array_length, 1, opened_file) != 1) return READ_INVALID_SIGNATURE;
         fread(&string_trash, trash_len, 1, opened_file);
     }
     return READ_OK;
