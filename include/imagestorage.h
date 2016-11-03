@@ -31,8 +31,7 @@ typedef struct {
 typedef struct{
     uint32_t biHeight;
     uint32_t biWidth;
-    pixel_t **colorArray;
-    uint32_t stringTrash;
+    pixel_t *colorArray;
 }image_t;
 
 

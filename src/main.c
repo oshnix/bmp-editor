@@ -2,15 +2,27 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include "imagestorage.h"
+#include "nfilerw.h"
 #include "imagelib.h"
 #include "strings.h"
 
-static char respath[]="../res/";
+static char respath[]="./res/";
 static char *open_modes[] = {"r+b", "w+b"};
-static char *filepath , *filename;
+char *filepath , *filename;
 
 
-void options_list(){
+int options_list(){
+    int i;
+    unsigned int inp;
+    printf("exit: 0\n");
+    for(i = 1; i <= options_count; i++){
+        printf("%s : %d\n",options[i - 1], i);
+    }
+    printf("Input option number: ");
+    while(!scanf("%ud",&inp) && (!(inp <= options_count) || inp)){
+        printf("Wrong input\nTry again: ");
+    }
+    return inp;
     /*
      * Каждая функция из списка берёт структуру image_t - описание картинки
      * выполняет над ней какие-то действия и возвращает структуру
@@ -18,51 +30,52 @@ void options_list(){
      */
 }
 
+
+void update_header(bmp_header_t *header_info, image_t image_short_info){
+    header_info->biHeight = image_short_info.biHeight;
+    header_info->biWidth = image_short_info.biWidth;
+}
+
+image_t get_header_info(bmp_header_t file_info){
+    image_t short_file_info;
+    short_file_info.colorArray = malloc(sizeof(void*)*file_info.biHeight);
+    short_file_info.biHeight = file_info.biHeight;
+    short_file_info.biWidth = file_info.biWidth;
+    return short_file_info;
+}
+
 void new_file_path(char* resource_string){
     filepath = malloc(256);
     filename = strCopyMove(resource_string,filepath);
 }
 
-FILE* fileopen(char* str_message, char* mode){
-    FILE* bmpimage = NULL;
-    while(!bmpimage){
-        printf("input name of the file %s: ", str_message);
-        scanf("%s",filename);
-        bmpimage = fopen(filepath,mode);
-    }
-    return bmpimage;
+void file_write(FILE* output_file, image_t image_short_info, bmp_header_t header_info){
+    write_header(output_file, header_info);
+    write_body(output_file, image_short_info);
+    fclose(output_file);
 }
 
 
 int main(){
-    int i, a;
-    long array_length;
-    bmp_header_t current_header, new_header;
-    FILE* current_bmp_image = fileopen("to open", open_modes[0]);
-    FILE* new_bmp_image = fileopen("to save", open_modes[1]);
-    image_t current_image, new_image;
+    int input;
+    FILE* current_bmp_image;
+    bmp_header_t current_header;
+    image_t current_image;
+    read_error_code_t result;
     new_file_path(respath);
-    fread(&current_header, sizeof(bmp_header_t), 1, current_bmp_image);
-    current_image.colorArray = malloc(sizeof(void*)*current_header.biHeight);
-    current_image.biHeight = current_header.biHeight;
-    current_image.biWidth = current_header.biWidth;
-    array_length = sizeof(pixel_t)*current_image.biWidth;
-    current_image.stringTrash = (4-(array_length % 4))%4;
-    for(i = 0; i < current_header.biHeight; i++){
-        current_image.colorArray[i] = malloc(array_length);
-        fread(current_image.colorArray[i], array_length, 1, current_bmp_image);
-        fseek(current_bmp_image,current_image.stringTrash, SEEK_CUR);
+    current_bmp_image = fileopen("to open", open_modes[0]);
+    if(read_header(current_bmp_image, &current_header) != 0) exit(1);
+    current_image = get_header_info(current_header);
+    /*printf("%d %d\n",current_image.biHeight, current_image.biWidth);*/
+    if((result = read_body(&current_image, current_bmp_image)) != 0) exit(1);
+    fclose(current_bmp_image);
+    while(input = options_list()){
+        current_image = functions_list[--input](current_image);
+        current_bmp_image = fileopen("to save", open_modes[1]);
+        update_header(&current_header,current_image);
+
+        file_write(current_bmp_image, current_image, current_header);
+
     }
-    new_image = rotate(current_image);
-    new_header = current_header;
-    new_header.biHeight = new_image.biHeight;
-    new_header.biWidth = new_image.biWidth;
-    array_length = sizeof(pixel_t)*new_image.biWidth;
-    fwrite(&new_header, sizeof(bmp_header_t),1,new_bmp_image);
-    for(i=new_header.biHeight - 1; i > 0; i--){
-        fwrite(new_image.colorArray[i], array_length, 1, new_bmp_image);
-        fwrite(&a, new_image.stringTrash, 1, new_bmp_image);
-    }
-    fclose(new_bmp_image);
     return 0;
 }
