@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include "math.h"
 #include "sepia_asm.h"
 #include "imagestorage.h"
@@ -48,13 +49,23 @@ image_t rotate_left(image_t input_image){
 }
 
 image_t sepia(image_t input_image){
+    double begin, end, time_spent;
     void *buffer = malloc(12);
     image_t result_image;
     result_image.biHeight = input_image.biHeight;
     result_image.biWidth = input_image.biWidth;
     int size = result_image.biWidth*result_image.biHeight;
     result_image.colorArray = malloc(size * sizeof(pixel_t));
+    begin = clock();
     sepia_asm(input_image.colorArray, size, buffer, result_image.colorArray);
+    end = clock();
+    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("SSE sepia time: %f\n", time_spent);
+    begin = clock();
+    sepia_c_inplace(&input_image);
+    end = clock();
+    time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("Pure C time: %f\n", time_spent);
     return result_image;
 }
 

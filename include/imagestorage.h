@@ -25,7 +25,7 @@ typedef struct{
 #pragma pack(pop)
 
 typedef struct {
-    char read, green, blue;
+    char red, green, blue;
 } pixel_t;
 
 typedef struct{
