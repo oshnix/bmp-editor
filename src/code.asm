@@ -45,39 +45,34 @@ sepia_asm:
     mov temp_mem, rdx
     mov result, rcx
     movaps xmm6, [max_values]
+
 .loop:
     ;начинаем цЫкл из трех действий
     test array_size, array_size
     jz .end
 ;First iteration
         xor eax, eax
-        mov al, [pixel_array]
-            mov [temp_mem], eax
-            mov [temp_mem + word_size], eax
-            mov [temp_mem + 2 * word_size], eax
-        mov al, [pixel_array + 3]
-            mov [temp_mem + 3 * word_size], eax
-        cvtpi2ps xmm0, [temp_mem+8]
-        movlhps xmm0, xmm0
-        cvtpi2ps xmm0, [temp_mem]
-        mov al, [pixel_array + 1]
-            mov [temp_mem], eax
-            mov [temp_mem + word_size], eax
-            mov [temp_mem + 2 * word_size], eax
-        mov al, [pixel_array + 4]
-            mov [temp_mem + 3 * word_size], eax
-        cvtpi2ps xmm1, [temp_mem+8]
-        movlhps xmm1, xmm1
-        cvtpi2ps xmm1, [temp_mem]
-        mov al, [pixel_array + 2]
-            mov [temp_mem], eax
-            mov [temp_mem + word_size], eax
-            mov [temp_mem + 2 * word_size], eax
-        mov al, [pixel_array + 5]
-            mov [temp_mem + 3 * word_size], eax
-        cvtpi2ps xmm2, [temp_mem+8]
-        movlhps xmm2, xmm2
-        cvtpi2ps xmm2, [temp_mem]
+        pxor xmm0, xmm0
+        pxor xmm1, xmm1
+        pxor xmm2, xmm2
+        mov al, byte[pixel_array]
+        pinsrb xmm0, al, 0
+        pinsrb xmm0, al, 4
+        pinsrb xmm0, al, 8
+        pinsrb xmm0, byte[pixel_array +3], 12
+        cvtdq2ps xmm0, xmm0
+        mov al, byte[pixel_array + 1]
+        pinsrb xmm1, al, 0
+        pinsrb xmm1, al, 4
+        pinsrb xmm1, al, 8
+        pinsrb xmm1, byte[pixel_array + 4], 12
+        cvtdq2ps xmm1, xmm1
+        mov al, byte[pixel_array + 2]
+        pinsrb xmm2, al, 0
+        pinsrb xmm2, al, 4
+        pinsrb xmm2, al, 8
+        pinsrb xmm2, byte[pixel_array + 5], 12
+        cvtdq2ps xmm2, xmm2
 
     ;Умножаем, приводим к минимальному числу
     movaps xmm3, [c1_1]
@@ -105,35 +100,32 @@ sepia_asm:
     add pixel_array, 3
     add result, 4
 ;Second iteration
+        xor eax, eax
+        pxor xmm0, xmm0
+        pxor xmm1, xmm1
+        pxor xmm2, xmm2
         mov al, [pixel_array]
-            mov [temp_mem], eax
-            mov [temp_mem + word_size], eax
+            pinsrb xmm0, al, 0
+            pinsrb xmm0, al, 4
         mov al, [pixel_array + 3]
-            mov [temp_mem + 2 * word_size], eax
-            mov [temp_mem + 3 * word_size], eax
-        cvtpi2ps xmm0, [temp_mem+8]
-        movlhps xmm0, xmm0
-        cvtpi2ps xmm0, [temp_mem]
-
+            pinsrb xmm0, al, 8
+            pinsrb xmm0, al, 12
+        cvtdq2ps xmm0, xmm0
         mov al, [pixel_array + 1]
-            mov [temp_mem], eax
-            mov [temp_mem + word_size], eax
+            pinsrb xmm1, al, 0
+            pinsrb xmm1, al, 4
         mov al, [pixel_array + 4]
-            mov [temp_mem + 2 * word_size], eax
-            mov [temp_mem + 3 * word_size], eax
-        cvtpi2ps xmm1, [temp_mem+8]
-        movlhps xmm1, xmm1
-        cvtpi2ps xmm1, [temp_mem]
-
+            pinsrb xmm1, al, 8
+            pinsrb xmm1, al, 12
+        cvtdq2ps xmm1, xmm1
         mov al, [pixel_array + 2]
-            mov [temp_mem], eax
-            mov [temp_mem + word_size], eax
+            pinsrb xmm2, al, 0
+            pinsrb xmm2, al, 4
         mov al, [pixel_array + 5]
-            mov [temp_mem + 2 * word_size], eax
-            mov [temp_mem + 3 * word_size], eax
-        cvtpi2ps xmm2, [temp_mem+8]
-        movlhps xmm2, xmm2
-        cvtpi2ps xmm2, [temp_mem]
+            pinsrb xmm2, al, 8
+            pinsrb xmm2, al, 12
+        cvtdq2ps xmm2, xmm2
+
 
     ;Умножаем, приводим к минимальному числу
     movaps xmm3, [c1_2]
@@ -161,35 +153,28 @@ sepia_asm:
     add pixel_array, 3
     add result, 4
 ;Third iteration
-        mov al, [pixel_array]
-            mov [temp_mem], eax
-        mov al, [pixel_array + 3]
-            mov [temp_mem + word_size], eax
-            mov [temp_mem + 2 * word_size], eax
-            mov [temp_mem + 3 * word_size], eax
-        cvtpi2ps xmm0, [temp_mem+8]
-        movlhps xmm0, xmm0
-        cvtpi2ps xmm0, [temp_mem]
-
-        mov al, [pixel_array + 1]
-            mov [temp_mem], eax
-        mov al, [pixel_array + 4]
-            mov [temp_mem + word_size], eax
-            mov [temp_mem + 2 * word_size], eax
-            mov [temp_mem + 3 * word_size], eax
-        cvtpi2ps xmm1, [temp_mem+8]
-        movlhps xmm1, xmm1
-        cvtpi2ps xmm1, [temp_mem]
-
-        mov al, [pixel_array + 2]
-            mov [temp_mem], eax
-        mov al, [pixel_array + 5]
-            mov [temp_mem + word_size], eax
-            mov [temp_mem + 2 * word_size], eax
-            mov [temp_mem + 3 * word_size], eax
-        cvtpi2ps xmm2, [temp_mem+8]
-        movlhps xmm2, xmm2
-        cvtpi2ps xmm2, [temp_mem]
+        xor eax, eax
+        pxor xmm0, xmm0
+        pxor xmm1, xmm1
+        pxor xmm2, xmm2
+        pinsrb xmm0, byte[pixel_array], 0
+        mov al, byte[pixel_array+3]
+        pinsrb xmm0, al, 4
+        pinsrb xmm0, al, 8
+        pinsrb xmm0, al, 12
+        cvtdq2ps xmm0, xmm0
+        pinsrb xmm1, byte[pixel_array + 1], 0
+        mov al, byte[pixel_array+4]
+        pinsrb xmm1, al, 4
+        pinsrb xmm1, al, 8
+        pinsrb xmm1, al, 12
+        cvtdq2ps xmm1, xmm1
+        pinsrb xmm2, byte[pixel_array+2], 0
+        mov al, byte[pixel_array+5]
+        pinsrb xmm2, al, 4
+        pinsrb xmm2, al, 8
+        pinsrb xmm2, al, 12
+        cvtdq2ps xmm2, xmm2
 
     ;Умножаем, приводим к минимальному числу
     movaps xmm3, [c1_3]

@@ -2,7 +2,7 @@ CC=gcc
 NASMC=nasm
 NASMFLAGS = -g -f elf64
 IDIR=./include
-CFLAGS= -lpthread -Wall -I$(IDIR)
+CFLAGS= -std=c89 -pedantic -Wall -I$(IDIR)
 BDIR=./build
 LIBS= -lm
 LDK = -o
