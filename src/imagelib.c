@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "math.h"
+#include "sepia_asm.h"
 #include "imagestorage.h"
 #include "imagelib.h"
 
@@ -46,8 +47,19 @@ image_t rotate_left(image_t input_image){
     return result_image;
 }
 
-image_t (*functions_list[])(image_t) = {rotate_right, rotate_left};
+image_t sepia(image_t input_image){
+    void *buffer = malloc(12);
+    image_t result_image;
+    result_image.biHeight = input_image.biHeight;
+    result_image.biWidth = input_image.biWidth;
+    int size = result_image.biWidth*result_image.biHeight;
+    result_image.colorArray = malloc(size * sizeof(pixel_t));
+    sepia_asm(input_image.colorArray, size, buffer, result_image.colorArray);
+    return result_image;
+}
+
+image_t (*functions_list[])(image_t) = {rotate_right, rotate_left, sepia};
 int options_count = sizeof(functions_list)/8;
 
-char *options[] = {"rotate 90 degrees right", "rotate 90 degrees left"};
+char *options[] = {"rotate 90 degrees right", "rotate 90 degrees left", "Sepia"};
 

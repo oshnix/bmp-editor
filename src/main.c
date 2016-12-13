@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include "imagestorage.h"
+#include "sepia_asm.h"
 #include "nfilerw.h"
 #include "imagelib.h"
 #include "strings.h"

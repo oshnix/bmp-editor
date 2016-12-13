@@ -1,22 +1,30 @@
 CC=gcc
+NASMC=nasm
+NASMFLAGS = -g -f elf64
 IDIR=./include
-CFLAGS= -ansi -pedantic -Wall -I$(IDIR)
+CFLAGS= -lpthread -Wall -I$(IDIR)
 BDIR=./build
 LIBS= -lm
 LDK = -o
-CDK= -c
+CDK= -c -g
 TARGET=main
-SRC=$(wildcard src/*.c)
-OBJ=$(patsubst src/%.c, build/%.o , $(SRC))
+CSRC=$(wildcard src/*.c)
+ASMSRC=$(wildcard src/*.asm)
+CFILES=$(patsubst src/%.c, build/%.o , $(CSRC))
+ASMFILES=$(patsubst src/%.asm, build/%.o, $(ASMSRC))
 FILES = main.c
 
-mainmake: $(OBJ)
-	$(CC) $(LDK) $(TARGET) $(OBJ)
+mainmake: makedir $(CFILES) $(ASMFILES)
+	$(CC) $(LDK) $(TARGET) $(CFILES) $(ASMFILES) $(CFLAGS)
 
 build/%.o: src/%.c 
 	$(CC) $(CDK) $(LDK) $@ $< $(CFLAGS)
 
+build/%.o: src/%.asm
+	$(NASMC) $(NASMFLAGS) $(LDK) $@ $<
+makedir:
+	mkdir -p build
 
-#clean:
-#	rm -rf $(TARGET)
+clean:
+	rm $(BDIR)/* $(TARGET)
 
