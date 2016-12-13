@@ -173,7 +173,7 @@ sepia_asm:
 
         mov al, [pixel_array + 1]
             mov [temp_mem], eax
-        mov al, [pixel_array + 3]
+        mov al, [pixel_array + 4]
             mov [temp_mem + word_size], eax
             mov [temp_mem + 2 * word_size], eax
             mov [temp_mem + 3 * word_size], eax
@@ -183,7 +183,7 @@ sepia_asm:
 
         mov al, [pixel_array + 2]
             mov [temp_mem], eax
-        mov al, [pixel_array + 4]
+        mov al, [pixel_array + 5]
             mov [temp_mem + word_size], eax
             mov [temp_mem + 2 * word_size], eax
             mov [temp_mem + 3 * word_size], eax
