@@ -18,7 +18,7 @@ mainmake: makedir $(CFILES) $(ASMFILES)
 	$(CC) $(LDK) $(TARGET) $(CFILES) $(ASMFILES) $(CFLAGS)
 
 build/%.o: src/%.c 
-	$(CC) $(CDK) $(LDK) $@ $< $(CFLAGS)
+	$(CC) $(CDK) $(LDK) $@ $< -O3 $(CFLAGS)
 
 build/%.o: src/%.asm
 	$(NASMC) $(NASMFLAGS) $(LDK) $@ $<

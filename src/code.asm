@@ -84,19 +84,11 @@ sepia_asm:
     addps xmm0, xmm1
     addps xmm0, xmm2
     minps xmm0, xmm6
-        cvtps2pi mm0, xmm0
-        movq [temp_mem], mm0
-        movhlps xmm0, xmm0
-        cvtps2pi mm0, xmm0
-        movq [temp_mem + 8], mm0
-            mov al, [temp_mem]
-            mov [result], al
-            mov al, [temp_mem + word_size]
-            mov [result + 1], al
-            mov al, [temp_mem + 2 * word_size]
-            mov [result + 2], al
-            mov al, [temp_mem + 3 * word_size]
-            mov [result + 3], al
+        cvtps2dq xmm0, xmm0
+        pextrb [result], xmm0, 0
+        pextrb [result + 1], xmm0, 4
+        pextrb [result + 2], xmm0, 8
+        pextrb [result + 3], xmm0, 12
     add pixel_array, 3
     add result, 4
 ;Second iteration
@@ -137,19 +129,11 @@ sepia_asm:
     addps xmm0, xmm1
     addps xmm0, xmm2
     minps xmm0, xmm6
-        cvtps2pi mm0, xmm0
-        movq [temp_mem], mm0
-        movhlps xmm0, xmm0
-        cvtps2pi mm0, xmm0
-        movq [temp_mem + 8], mm0
-            mov al, [temp_mem]
-            mov [result], al
-            mov al, [temp_mem + word_size]
-            mov [result + 1], al
-            mov al, [temp_mem + 2 * word_size]
-            mov [result + 2], al
-            mov al, [temp_mem + 3 * word_size]
-            mov [result + 3], al
+        cvtps2dq xmm0, xmm0
+        pextrb [result], xmm0, 0
+        pextrb [result + 1], xmm0, 4
+        pextrb [result + 2], xmm0, 8
+        pextrb [result + 3], xmm0, 12
     add pixel_array, 3
     add result, 4
 ;Third iteration
@@ -186,19 +170,11 @@ sepia_asm:
     addps xmm0, xmm1
     addps xmm0, xmm2
     minps xmm0, xmm6
-        cvtps2pi mm0, xmm0
-        movq [temp_mem], mm0
-        movhlps xmm0, xmm0
-        cvtps2pi mm0, xmm0
-        movq [temp_mem + 8], mm0
-            mov al, [temp_mem]
-            mov [result], al
-            mov al, [temp_mem + word_size]
-            mov [result + 1], al
-            mov al, [temp_mem + 2 * word_size]
-            mov [result + 2], al
-            mov al, [temp_mem + 3 * word_size]
-            mov [result + 3], al
+        cvtps2dq xmm0, xmm0
+        pextrb [result], xmm0, 0
+        pextrb [result + 1], xmm0, 4
+        pextrb [result + 2], xmm0, 8
+        pextrb [result + 3], xmm0, 12
     add pixel_array, 6
     add result, 4
     sub array_size, 4
