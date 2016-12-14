@@ -45,32 +45,25 @@ sepia_asm:
     mov temp_mem, rdx
     mov result, rcx
     movaps xmm6, [max_values]
-
-.loop:
-    ;начинаем цЫкл из трех действий
     test array_size, array_size
     jz .end
+.loop:
+    ;начинаем цЫкл из трех действий
 ;First iteration
         xor eax, eax
         pxor xmm0, xmm0
         pxor xmm1, xmm1
         pxor xmm2, xmm2
-        mov al, byte[pixel_array]
-        pinsrb xmm0, al, 0
-        pinsrb xmm0, al, 4
-        pinsrb xmm0, al, 8
+        pinsrb xmm0, byte[pixel_array], 0
+        shufps xmm0, xmm0, 00000000
         pinsrb xmm0, byte[pixel_array +3], 12
         cvtdq2ps xmm0, xmm0
-        mov al, byte[pixel_array + 1]
-        pinsrb xmm1, al, 0
-        pinsrb xmm1, al, 4
-        pinsrb xmm1, al, 8
+        pinsrb xmm1, byte[pixel_array+ 1], 0
+        shufps xmm1, xmm1, 00000000
         pinsrb xmm1, byte[pixel_array + 4], 12
         cvtdq2ps xmm1, xmm1
-        mov al, byte[pixel_array + 2]
-        pinsrb xmm2, al, 0
-        pinsrb xmm2, al, 4
-        pinsrb xmm2, al, 8
+        pinsrb xmm2, byte[pixel_array + 2], 0
+        shufps xmm2, xmm2, 00000000
         pinsrb xmm2, byte[pixel_array + 5], 12
         cvtdq2ps xmm2, xmm2
 
@@ -96,27 +89,18 @@ sepia_asm:
         pxor xmm0, xmm0
         pxor xmm1, xmm1
         pxor xmm2, xmm2
-        mov al, [pixel_array]
-            pinsrb xmm0, al, 0
-            pinsrb xmm0, al, 4
-        mov al, [pixel_array + 3]
-            pinsrb xmm0, al, 8
-            pinsrb xmm0, al, 12
+            pinsrb xmm0, [pixel_array], 0
+            pinsrb xmm0, [pixel_array + 3], 8
+        shufps xmm0, xmm0, 0b00001010
         cvtdq2ps xmm0, xmm0
-        mov al, [pixel_array + 1]
-            pinsrb xmm1, al, 0
-            pinsrb xmm1, al, 4
-        mov al, [pixel_array + 4]
-            pinsrb xmm1, al, 8
-            pinsrb xmm1, al, 12
-        cvtdq2ps xmm1, xmm1
-        mov al, [pixel_array + 2]
-            pinsrb xmm2, al, 0
-            pinsrb xmm2, al, 4
-        mov al, [pixel_array + 5]
-            pinsrb xmm2, al, 8
-            pinsrb xmm2, al, 12
-        cvtdq2ps xmm2, xmm2
+           pinsrb xmm1, [pixel_array + 1], 0
+           pinsrb xmm1, [pixel_array + 4], 8
+       shufps xmm1, xmm1, 0b00001010
+       cvtdq2ps xmm1, xmm1
+           pinsrb xmm2, [pixel_array + 2], 0
+           pinsrb xmm2, [pixel_array + 5], 8
+       shufps xmm2, xmm2, 0b00001010
+       cvtdq2ps xmm2, xmm2
 
 
     ;Умножаем, приводим к минимальному числу
@@ -141,24 +125,19 @@ sepia_asm:
         pxor xmm0, xmm0
         pxor xmm1, xmm1
         pxor xmm2, xmm2
-        pinsrb xmm0, byte[pixel_array], 0
-        mov al, byte[pixel_array+3]
-        pinsrb xmm0, al, 4
-        pinsrb xmm0, al, 8
-        pinsrb xmm0, al, 12
+            pinsrb xmm0, byte[pixel_array], 0
+            pinsrb xmm0, byte[pixel_array+3], 4
+        shufps xmm0, xmm0, 0b00010101
         cvtdq2ps xmm0, xmm0
-        pinsrb xmm1, byte[pixel_array + 1], 0
-        mov al, byte[pixel_array+4]
-        pinsrb xmm1, al, 4
-        pinsrb xmm1, al, 8
-        pinsrb xmm1, al, 12
+            pinsrb xmm1, byte[pixel_array + 1], 0
+            pinsrb xmm1, byte[pixel_array + 4], 4
+        shufps xmm1, xmm1, 0b00010101
         cvtdq2ps xmm1, xmm1
-        pinsrb xmm2, byte[pixel_array+2], 0
-        mov al, byte[pixel_array+5]
-        pinsrb xmm2, al, 4
-        pinsrb xmm2, al, 8
-        pinsrb xmm2, al, 12
+            pinsrb xmm2, byte[pixel_array + 2], 0
+            pinsrb xmm2, byte[pixel_array + 5], 4
+        shufps xmm2, xmm2, 0b00010101
         cvtdq2ps xmm2, xmm2
+
 
     ;Умножаем, приводим к минимальному числу
     movaps xmm3, [c1_3]
@@ -178,7 +157,7 @@ sepia_asm:
     add pixel_array, 6
     add result, 4
     sub array_size, 4
-    jmp .loop
+    jnz .loop
 .end:
     pop r15
     pop r14
