@@ -24,6 +24,7 @@ build/%.o: src/%.asm
 	$(NASMC) $(NASMFLAGS) $(LDK) $@ $<
 makedir:
 	mkdir -p build
+	mkdir -p res
 
 clean:
 	rm $(BDIR)/* $(TARGET)
